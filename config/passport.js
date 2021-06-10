@@ -13,22 +13,46 @@ passport.deserializeUser(function(id, done){
     })
 });
 
+// local sign-up
+passport.use('local.signup', new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password',
+    passReqToCallback:true   
+}, function(req, email, password, done){
+    User.findOne({ 'email': email}, function(err, user){
+        
+        if(err) { return done(err);}
+        if(user){
+            
+            return done(null, false, { message: 'Email is already in use.'})
+        }
+        var newUser = new User();
+        newUser.email = email;
+        newUser.password = newUser.encryptPassword(password);
+        newUser.save(function(err, result){
+            if(err){
+                return done(err)
+            }           
+            return done(null, newUser);
+        })
+    });
+}));
 
 // local sign-in
 passport.use('local.signin', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
-    passReqToCallback: true
+    passReqToCallback:true
 }, function(req, email, password, done){
     User.findOne({ 'email': email }, function(err, user){
         if(err) { return done(err)};
         console.log(user);
         if(!user){
-            return done(null, false, { messages: ' Not uer found'})
+            return done(null, false, { message: ' Not uer found'})
         }
         if(!user.validPassword(password)){
-            return done(null, false, { messages: 'Wrong password'})
-        }
+            return done(null, false, { message: 'Wrong password'})
+        }s
         return done(null, user);
     });
 }));
