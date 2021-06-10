@@ -9,13 +9,34 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var flash = require('connect-flash');
 var app = express();
+require('./config/passport');
+
+
+mongoose.connect('mongodb://localhost/express-auth',{ useNewUrlParser: true, useUnifiedTopology: true}, err => {
+    if(err) throw err;
+    console.log('Connect successfullyy!!');
+});
+
+app.use(session({
+    secret: 'adsa897adsa98bs',
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
 var userRouter = require('./routes/user.routes');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false}));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', userRouter);

@@ -7,4 +7,7 @@ router.get('/', function(req, res){
     res.render('index');
 });
 
+router.get('/signin',signinController.login);
+router.post('/signin', signinController.postLogin);
+
 module.exports = router;
